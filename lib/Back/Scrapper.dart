@@ -131,12 +131,12 @@ Future<List<List<YGOCard>>> scrapsite(List<List> decklist) async {
       String cardname = decklist[i][j].replaceAll(' ', '+');
       //String cardname = 'Predaplant+Dragostapelia';
       //Low
-      String url =
-          'https://www.trollandtoad.com/category.php?hide-oos=on&min-price=&max-price=&items-pp=60&item-condition=&search-words${cardname}&token=Oi4tdttdqkgSf6ritYdW0WBRCn5mPpL6WaorGmYYGcURXJmf0Mv0RCWMK5QDh%2BrMg1PmZou%2BHJLEkBwyD2d0qQ%3D%3D&selected-cat=4736&sort-order=L-H&page-no=1&view=list&subproduct=0';
+      //String url =
+      'https://www.trollandtoad.com/category.php?hide-oos=on&min-price=&max-price=&items-pp=60&item-condition=&search-words${cardname}&token=Oi4tdttdqkgSf6ritYdW0WBRCn5mPpL6WaorGmYYGcURXJmf0Mv0RCWMK5QDh%2BrMg1PmZou%2BHJLEkBwyD2d0qQ%3D%3D&selected-cat=4736&sort-order=L-H&page-no=1&view=list&subproduct=0';
 
       //Relevant
-      //String url =
-      'https://www.trollandtoad.com/category.php?selected-cat=4736&search-words=${cardname}&token=GqLTI3x%2BHo6A8pQlcyMPjUfVvMvoAgUruTsRyC0ly97n0MezHAF59ObmcS6LlQ7Ye6jmThKEfBtV9HZmbiyUSA%3D%3D';
+      String url =
+          'https://www.trollandtoad.com/category.php?selected-cat=4736&search-words=${cardname}&token=GqLTI3x%2BHo6A8pQlcyMPjUfVvMvoAgUruTsRyC0ly97n0MezHAF59ObmcS6LlQ7Ye6jmThKEfBtV9HZmbiyUSA%3D%3D';
       final response = await client.get(Uri.parse(url));
       if (response.statusCode == 200) {
         var document = parser.parse(response.body);
