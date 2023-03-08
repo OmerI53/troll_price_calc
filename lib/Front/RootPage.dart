@@ -23,7 +23,7 @@ class _RootPageState extends State<RootPage> {
 
   @override
   Widget build(BuildContext context) => isloading
-      ? LoadingPage()
+      ? const LoadingPage()
       : Scaffold(
           backgroundColor: Colors.transparent,
           body: Container(
@@ -137,6 +137,7 @@ class _RootPageState extends State<RootPage> {
                     setState(() {
                       isloading = true;
                     });
+
                     decklist = await scrapsite(deckconv);
                     setState(() {
                       isloading = false;
@@ -199,7 +200,7 @@ class LoadingPage extends StatelessWidget {
         backgroundColor: Colors.transparent,
         body: Center(
             child: SpinKitSpinningLines(
-          duration: const Duration(milliseconds: 200),
+          duration: const Duration(seconds: 2),
           size: 140,
           color: Colors.deepPurple.withOpacity(0.6),
         )),

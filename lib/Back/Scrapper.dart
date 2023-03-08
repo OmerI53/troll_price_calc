@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:html/parser.dart' as parser;
@@ -106,7 +107,7 @@ convertYDK(List<List> decklist) {
   for (int i = 0; i < decklist.length; i++) {
     for (int j = 0; j < decklist[i].length; j++) {
       decklistcopy[i][j] = idName[decklist[i][j]];
-      print(decklistcopy[i][j]);
+      //print(decklistcopy[i][j]);
     }
   }
 
@@ -120,7 +121,8 @@ Future<List<List<YGOCard>>> scrapsite(List<List> decklist) async {
   var client = http.Client();
   for (int i = 0; i < decklist.length; i++) {
     List<YGOCard> deckparts = [];
-    for (int j = 0; j < decklist[i].length; j++) {
+    for (int j = 0; j < 1; j++) {
+      //Remove same cards
       if (j != 0) {
         if (decklist[i][j - 1] == decklist[i][j]) {
           deckparts.add(deckparts.last);
@@ -128,46 +130,79 @@ Future<List<List<YGOCard>>> scrapsite(List<List> decklist) async {
         }
       }
       print(decklist[i][j]);
-      String cardname = decklist[i][j].replaceAll(' ', '+');
-      //String cardname = 'Predaplant+Dragostapelia';
-      //Low
-      //String url =
-      'https://www.trollandtoad.com/category.php?hide-oos=on&min-price=&max-price=&items-pp=60&item-condition=&search-words${cardname}&token=Oi4tdttdqkgSf6ritYdW0WBRCn5mPpL6WaorGmYYGcURXJmf0Mv0RCWMK5QDh%2BrMg1PmZou%2BHJLEkBwyD2d0qQ%3D%3D&selected-cat=4736&sort-order=L-H&page-no=1&view=list&subproduct=0';
-
+      //String cardname = decklist[i][j].replaceAll(' ', '+');
+      String cardname = 'Small+World';
       //Relevant
       String url =
-          'https://www.trollandtoad.com/category.php?selected-cat=4736&search-words=${cardname}&token=GqLTI3x%2BHo6A8pQlcyMPjUfVvMvoAgUruTsRyC0ly97n0MezHAF59ObmcS6LlQ7Ye6jmThKEfBtV9HZmbiyUSA%3D%3D';
+          'https://www.trollandtoad.com/yugioh/all-yu-gi-oh-singles/7087?search-words=${cardname}&token=iIStBBEd1JKwBOxaU3pw%2FPJSqk6N8TtUlJzz3F4J8pu1LVQaGJuRhuTG6pdxFNKU59lXPwke76AvLOTWgSbTSA%3D%3D';
       final response = await client.get(Uri.parse(url));
+
       if (response.statusCode == 200) {
         var document = parser.parse(response.body);
+        //listing of items
         var listings = document.getElementsByClassName('product-col');
         if (listings.isNotEmpty) {
-          int productIndex = -1;
+          int productIndex = -1; //index of listed items
+          var finalName;
+          var finalImgHTML;
+          String finalPrice = '0';
+
+          //itterate over some of the lisings to get the min price
+
           do {
-            productIndex += 1;
-            var imgHTML = listings[productIndex]
-                .children[0]
-                .children[0]
-                .children[0]
-                .children[0]
-                .children[0];
-            String? img = imgHTML.attributes['src'];
+            productIndex++;
+
+            if (productIndex >= listings.length) {
+              //break if trying to access non existing listings
+              break;
+            }
+
             var priceCol =
                 listings[productIndex].children[0].children[0].children[3];
             if (priceCol.children.isNotEmpty) {
+              //check if there is price listings
+
               var sellerRow = priceCol.children[0].children[1];
               var priceHTML = sellerRow.children[sellerRow.children.length - 2];
-              c = YGOCard(imgHTML.attributes['alt'].toString(),
-                  img!.replaceAll('small', 'pictures'), priceHTML.text.trim());
+              var itPrice =
+                  priceHTML.text.trim().substring(1).replaceAll(',', '');
+
+              var itImgHTML = listings[productIndex]
+                  .children[0]
+                  .children[0]
+                  .children[0]
+                  .children[0]
+                  .children[0];
+              var itName = itImgHTML.attributes['alt'].toString();
+
+              if (finalPrice == '0') {
+                //initial assign
+                finalPrice = itPrice;
+                finalName = itName;
+                finalImgHTML = itImgHTML;
+              }
+
+              if (double.parse(itPrice.substring(1).replaceAll(',', '')) <
+                      double.parse(finalPrice) &&
+                  itName.contains(cardname.replaceAll('+', ' '))) {
+                finalPrice = itPrice;
+                finalName = itName;
+                finalImgHTML = itImgHTML;
+              }
             }
-          } while (c.name.contains('Field Center Card'));
+          } while (productIndex < 7);
+
+          String? img = finalImgHTML.attributes['src'];
+
+          c = YGOCard(
+              finalName, img!.replaceAll('small', 'pictures'), finalPrice);
           print(c.name);
         }
       } else {
         print('scrapper access denied');
       }
       deckparts.add(c);
-      sleep(const Duration(seconds: 2));
+      await Future.delayed(const Duration(seconds: 2));
     }
     deckClass.add(deckparts);
   }
@@ -192,10 +227,11 @@ List<double> priceCalc(List<List<YGOCard>> decklist) {
 Future<void> main(List<String> args) async {
   //var ydkpath = '/Users/omerislam/desktop/xxx-Mathmech.ydk';
 
+  /*
   var ydkpath = '/Users/omerislam/desktop/Branded Despia.ydk';
   List<List> deckparse = await parseYDK(ydkpath);
   List<List> deckconv = convertYDK(deckparse);
-  /*
+  
   deckconv.forEach((element) {
     print(element);
   });
