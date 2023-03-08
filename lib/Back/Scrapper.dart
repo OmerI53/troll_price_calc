@@ -121,7 +121,7 @@ Future<List<List<YGOCard>>> scrapsite(List<List> decklist) async {
   var client = http.Client();
   for (int i = 0; i < decklist.length; i++) {
     List<YGOCard> deckparts = [];
-    for (int j = 0; j < 1; j++) {
+    for (int j = 0; j < decklist[i].length; j++) {
       //Remove same cards
       if (j != 0) {
         if (decklist[i][j - 1] == decklist[i][j]) {
@@ -129,20 +129,19 @@ Future<List<List<YGOCard>>> scrapsite(List<List> decklist) async {
           continue;
         }
       }
-      print(decklist[i][j]);
-      //String cardname = decklist[i][j].replaceAll(' ', '+');
-      String cardname = 'Small+World';
+      String cardname = decklist[i][j];
+      //String cardname = 'Small World';
       //Relevant
       String url =
-          'https://www.trollandtoad.com/yugioh/all-yu-gi-oh-singles/7087?search-words=${cardname}&token=iIStBBEd1JKwBOxaU3pw%2FPJSqk6N8TtUlJzz3F4J8pu1LVQaGJuRhuTG6pdxFNKU59lXPwke76AvLOTWgSbTSA%3D%3D';
+          'https://www.trollandtoad.com/yugioh/all-yu-gi-oh-singles/7087?search-words=${cardname.replaceAll(' ', '+')}&token=iIStBBEd1JKwBOxaU3pw%2FPJSqk6N8TtUlJzz3F4J8pu1LVQaGJuRhuTG6pdxFNKU59lXPwke76AvLOTWgSbTSA%3D%3D';
       final response = await client.get(Uri.parse(url));
-
+      print(cardname);
       if (response.statusCode == 200) {
         var document = parser.parse(response.body);
         //listing of items
         var listings = document.getElementsByClassName('product-col');
         if (listings.isNotEmpty) {
-          int productIndex = -1; //index of listed items
+          int productIndex = 0; //index of listed items
           var finalName;
           var finalImgHTML;
           String finalPrice = '0';
@@ -150,8 +149,6 @@ Future<List<List<YGOCard>>> scrapsite(List<List> decklist) async {
           //itterate over some of the lisings to get the min price
 
           do {
-            productIndex++;
-
             if (productIndex >= listings.length) {
               //break if trying to access non existing listings
               break;
@@ -180,16 +177,16 @@ Future<List<List<YGOCard>>> scrapsite(List<List> decklist) async {
                 finalPrice = itPrice;
                 finalName = itName;
                 finalImgHTML = itImgHTML;
+                continue;
               }
-
-              if (double.parse(itPrice.substring(1).replaceAll(',', '')) <
-                      double.parse(finalPrice) &&
-                  itName.contains(cardname.replaceAll('+', ' '))) {
+              if ((double.parse(itPrice) <= double.parse(finalPrice)) &&
+                  itName.contains(cardname)) {
                 finalPrice = itPrice;
                 finalName = itName;
                 finalImgHTML = itImgHTML;
               }
             }
+            productIndex++;
           } while (productIndex < 7);
 
           String? img = finalImgHTML.attributes['src'];
@@ -207,36 +204,35 @@ Future<List<List<YGOCard>>> scrapsite(List<List> decklist) async {
     deckClass.add(deckparts);
   }
   client.close();
+
   return deckClass;
 }
 
-List<double> priceCalc(List<List<YGOCard>> decklist) {
-  List<double> priceArr = [];
-
-  for (int i = 0; i < decklist.length; i++) {
-    double cost = 0;
-    for (int j = 0; j < decklist[i].length; j++) {
-      cost += double.parse(decklist[i][j].price.substring(1));
-    }
-    priceArr.add(cost);
+int priceCalc(List cardlist) {
+  double cost = 0;
+  for (int i = 0; i < cardlist.length; i++) {
+    cost += double.parse(cardlist[i].price);
   }
-  priceArr.add(priceArr[0] + priceArr[1] + priceArr[2]);
-  return priceArr;
+  return cost.round();
 }
 
 Future<void> main(List<String> args) async {
-  //var ydkpath = '/Users/omerislam/desktop/xxx-Mathmech.ydk';
+  List l = [];
+  await Future.delayed(const Duration(seconds: 1), (() {
+    l.add(1);
+    l.add(2);
+    l.add(3);
+  }));
+
+  late Map m = Map.of(l.asMap());
+  print(m);
+  m.remove(1);
+  print(m);
 
   /*
   var ydkpath = '/Users/omerislam/desktop/Branded Despia.ydk';
   List<List> deckparse = await parseYDK(ydkpath);
   List<List> deckconv = convertYDK(deckparse);
-  
-  deckconv.forEach((element) {
-    print(element);
-  });
-
   //List<List<YGOCard>> decklist = await scrapsite(deckconv);
-  //print(decklist[0][0].price);
   */
 }

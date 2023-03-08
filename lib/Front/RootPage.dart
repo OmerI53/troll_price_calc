@@ -87,10 +87,10 @@ class _RootPageState extends State<RootPage> {
                           if (result != null &&
                               result.files.single.path != null) {
                             PlatformFile file = result.files.first;
-                            print(file.path);
+                            //print(file.path);
                             setState(() {
                               ydkpath = file.path!;
-                              ydkfileName = p.basename(ydkpath);
+                              ydkfileName = p.basenameWithoutExtension(ydkpath);
                             });
                           } else {
                             // User canceled the picker
@@ -200,7 +200,7 @@ class LoadingPage extends StatelessWidget {
         backgroundColor: Colors.transparent,
         body: Center(
             child: SpinKitSpinningLines(
-          duration: const Duration(seconds: 2),
+          duration: const Duration(seconds: 1),
           size: 140,
           color: Colors.deepPurple.withOpacity(0.6),
         )),
