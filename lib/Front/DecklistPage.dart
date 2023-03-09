@@ -63,7 +63,7 @@ class _DecklistPageState extends State<DecklistPage> {
                         behavior: ScrollConfiguration.of(context)
                             .copyWith(scrollbars: false),
                         child: GridView.count(
-                          childAspectRatio: 0.5,
+                          childAspectRatio: 0.48,
                           crossAxisSpacing: 7,
                           padding: const EdgeInsets.all(4),
                           // ignore: sort_child_properties_last
@@ -73,7 +73,6 @@ class _DecklistPageState extends State<DecklistPage> {
                           crossAxisCount: 10,
                         ),
                       ),
-                      //CardView(widget.decklist[0][0]),
                     ),
                     Positioned(
                       top: -12,
@@ -116,12 +115,6 @@ class _DecklistPageState extends State<DecklistPage> {
                           children: formList(
                               side.length, side, removeItems, removedSide),
 
-                          /*
-                          List.generate(side.length, (index) {
-                            return CardView(
-                                side[index], index, removeItems, removedSide);
-                          })
-                          */
                           // ignore: unnecessary_null_comparison
                           crossAxisCount: 15,
                         ),

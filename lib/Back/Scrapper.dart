@@ -132,10 +132,10 @@ Future<List<List<YGOCard>>> scrapsite(List<List> decklist) async {
         }
       }
       String cardname = decklist[i][j];
-      //String cardname = ' Guardian Chimera';
+      //String cardname = 'Ash Blossom & Joyous Spring';
       //Relevant
       String url =
-          'https://www.trollandtoad.com/yugioh/all-yu-gi-oh-singles/7087?search-words=${cardname.replaceAll(' ', '+')}&token=iIStBBEd1JKwBOxaU3pw%2FPJSqk6N8TtUlJzz3F4J8pu1LVQaGJuRhuTG6pdxFNKU59lXPwke76AvLOTWgSbTSA%3D%3D';
+          'https://www.trollandtoad.com/yugioh/all-yu-gi-oh-singles/7087?hide-oos=on&search-words=${cardname.replaceAll(' ', '+')}&token=iIStBBEd1JKwBOxaU3pw%2FPJSqk6N8TtUlJzz3F4J8pu1LVQaGJuRhuTG6pdxFNKU59lXPwke76AvLOTWgSbTSA%3D%3D';
       final response = await client.get(Uri.parse(url));
       print(cardname);
       if (response.statusCode == 200) {
@@ -183,15 +183,17 @@ Future<List<List<YGOCard>>> scrapsite(List<List> decklist) async {
                 finalImgHTML = itImgHTML;
                 continue;
               }
+
               if ((double.parse(itPrice) <= double.parse(finalPrice)) &&
-                  itName.contains(cardname)) {
+                  itName.replaceAll(RegExp('[^A-Za-z0-9]'), '').contains(
+                      cardname.replaceAll(RegExp('[^A-Za-z0-9]'), ''))) {
                 finalPrice = itPrice;
                 finalName = itName;
                 finalImgHTML = itImgHTML;
               }
             }
             productIndex++;
-          } while (productIndex < 7);
+          } while (productIndex < 11);
 
           String? img = finalImgHTML.attributes['src'];
 
