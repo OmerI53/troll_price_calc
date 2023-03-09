@@ -23,8 +23,8 @@ class YGOCard {
 }
 
 getCardDatabase() async {
-  final file = File('db.json');
-
+  final file = File('lib/Back/db.json');
+  //https://db.ygoprodeck.com/api/v7/cardinfo.php?name=Harpie%27s%20Feather%20Duster
   var client = http.Client();
   var url = Uri.parse('https://db.ygoprodeck.com/api/v7/cardinfo.php');
   var response = await client.get(url);
@@ -34,11 +34,13 @@ getCardDatabase() async {
     var idname = {};
     var data = json.decode(response.body);
     List cardlist = data['data'];
-    for (int i = 0; i < cardlist.length; i++) {
-      //print('${cardlist[i]['id'].toString()}:${cardlist[i]['name']}');
-      idname[cardlist[i]['id'].toString()] = cardlist[i]['name'].toString();
+    for (var i in cardlist) {
+      String name = i['name'];
+      for (var j in i['card_images']) {
+        idname[j['id'].toString()] = name;
+      }
     }
-    File idnamef = File('id-name.json');
+    File idnamef = File('lib/Back/id-name.json');
     idnamef.writeAsString(jsonEncode(idname));
   } else {
     print("error from api");
@@ -107,7 +109,7 @@ convertYDK(List<List> decklist) {
   for (int i = 0; i < decklist.length; i++) {
     for (int j = 0; j < decklist[i].length; j++) {
       decklistcopy[i][j] = idName[decklist[i][j]];
-      //print(decklistcopy[i][j]);
+      decklistcopy[i][j] ?? print('object');
     }
   }
 
@@ -130,7 +132,7 @@ Future<List<List<YGOCard>>> scrapsite(List<List> decklist) async {
         }
       }
       String cardname = decklist[i][j];
-      //String cardname = 'Small World';
+      //String cardname = ' Guardian Chimera';
       //Relevant
       String url =
           'https://www.trollandtoad.com/yugioh/all-yu-gi-oh-singles/7087?search-words=${cardname.replaceAll(' ', '+')}&token=iIStBBEd1JKwBOxaU3pw%2FPJSqk6N8TtUlJzz3F4J8pu1LVQaGJuRhuTG6pdxFNKU59lXPwke76AvLOTWgSbTSA%3D%3D';
@@ -155,7 +157,8 @@ Future<List<List<YGOCard>>> scrapsite(List<List> decklist) async {
             }
 
             var priceCol =
-                listings[productIndex].children[0].children[0].children[3];
+                listings[productIndex].children[0].children.last.children[3];
+
             if (priceCol.children.isNotEmpty) {
               //check if there is price listings
 
@@ -166,7 +169,8 @@ Future<List<List<YGOCard>>> scrapsite(List<List> decklist) async {
 
               var itImgHTML = listings[productIndex]
                   .children[0]
-                  .children[0]
+                  .children
+                  .last
                   .children[0]
                   .children[0]
                   .children[0];
@@ -217,22 +221,11 @@ int priceCalc(List cardlist) {
 }
 
 Future<void> main(List<String> args) async {
-  List l = [];
-  await Future.delayed(const Duration(seconds: 1), (() {
-    l.add(1);
-    l.add(2);
-    l.add(3);
-  }));
+  //getCardDatabase();
 
-  late Map m = Map.of(l.asMap());
-  print(m);
-  m.remove(1);
-  print(m);
-
-  /*
-  var ydkpath = '/Users/omerislam/desktop/Branded Despia.ydk';
+  var ydkpath = '/Users/omerislam/desktop/Salvation Kashtira Tearlaments.ydk';
   List<List> deckparse = await parseYDK(ydkpath);
   List<List> deckconv = convertYDK(deckparse);
-  //List<List<YGOCard>> decklist = await scrapsite(deckconv);
-  */
+
+  List<List<YGOCard>> decklist = await scrapsite(deckconv);
 }

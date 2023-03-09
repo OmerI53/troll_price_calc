@@ -170,7 +170,9 @@ class _RootPageState extends State<RootPage> {
                             ),
                             side: const BorderSide(
                                 color: Colors.black, width: 2)),
-                        onPressed: () {},
+                        onPressed: () async {
+                          getCardDatabase();
+                        },
                         child: const Text(
                           'Update DataBase',
                           style: TextStyle(
