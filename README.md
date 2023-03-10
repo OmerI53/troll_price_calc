@@ -1,16 +1,11 @@
 # troll_price_calc
 
-A new Flutter project.
+Calculate the minimum [Troll&Toad](https://www.trollandtoad.com) price for Yugioh cards using ydk file.
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
+## Notes
 
-A few resources to get you started if this is your first Flutter project:
+* Only finds the cards that are in stock.
+* The program does not find the cheapest version of cards that has symbols, such as Live☆Twin (Might fix later).
+* Does not have check for OCG cards so might match them if they are in stock has lower price (Might fix later).
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
