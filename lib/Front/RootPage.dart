@@ -132,22 +132,27 @@ class _RootPageState extends State<RootPage> {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10))),
                   onPressed: () async {
-                    List<List> deckparse = await parseYDK(ydkpath);
-                    List<List> deckconv = convertYDK(deckparse);
-                    setState(() {
-                      isloading = true;
-                    });
+                    if (ydkpath != '') {
+                      List<List> deckparse = await parseYDK(ydkpath);
+                      List<List> deckconv = convertYDK(deckparse);
+                      setState(() {
+                        isloading = true;
+                      });
 
-                    decklist = await scrapsite(deckconv);
-                    setState(() {
+                      decklist = await scrapsite(deckconv);
+                      setState(() {
+                        isloading = false;
+                      });
+                      // ignore: use_build_context_synchronously
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) =>
+                              DecklistPage(decklist, ydkfileName)));
                       isloading = false;
-                    });
-                    // ignore: use_build_context_synchronously
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) =>
-                            DecklistPage(decklist, ydkfileName)));
-                    isloading = false;
-                    setState(() {});
+                      setState(() {});
+                    } else {
+                      showAlerDialog(
+                          context, 'select a file', const Icon(Icons.error));
+                    }
                   },
                   child: const Text(
                     'Start',
@@ -172,6 +177,9 @@ class _RootPageState extends State<RootPage> {
                                 color: Colors.black, width: 2)),
                         onPressed: () async {
                           getCardDatabase();
+
+                          showAlerDialog(
+                              context, 'Done', const Icon(Icons.done));
                         },
                         child: const Text(
                           'Update DataBase',
@@ -209,4 +217,23 @@ class LoadingPage extends StatelessWidget {
       ),
     );
   }
+}
+
+showAlerDialog(BuildContext context, String message, Icon icon) {
+  Widget okButton = TextButton(
+      onPressed: () {
+        Navigator.pop(context);
+      },
+      child: const Text("OK"));
+
+  AlertDialog alert = AlertDialog(
+    title: Text(message),
+    content: icon,
+    actions: [okButton],
+  );
+  showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      });
 }
