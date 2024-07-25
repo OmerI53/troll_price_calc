@@ -183,7 +183,6 @@ Future<List<List<YGOCard>>> scrapsite(List<List> decklist) async {
                 finalImgHTML = itImgHTML;
                 continue;
               }
-
               if ((double.parse(itPrice) <= double.parse(finalPrice)) &&
                   itName.replaceAll(RegExp('[^A-Za-z0-9]'), '').contains(
                       cardname.replaceAll(RegExp('[^A-Za-z0-9]'), ''))) {
